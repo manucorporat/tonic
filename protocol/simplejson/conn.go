@@ -2,18 +2,23 @@ package simplejson
 
 import (
 	"bytes"
-	"log"
+	"sync"
 
 	"github.com/gorilla/websocket"
 	"github.com/manucorporat/tonic/common"
 )
 
 type conn struct {
+	mutex  sync.Mutex
 	socket *websocket.Conn
 }
 
 func newConn(socket *websocket.Conn) *conn {
 	return &conn{socket: socket}
+}
+
+func (c *conn) Mutex() *sync.Mutex {
+	return &c.mutex
 }
 
 func (c *conn) Send(msg common.Message) error {
@@ -39,8 +44,8 @@ func (c *conn) Recv() (common.Message, error) {
 		}
 		msg, err := decodeMsg(reader)
 		if err != nil {
-			log.Println("Error parsing message: ", err)
-			continue
+			c.socket.Close()
+			return nil, err
 		}
 		return msg, nil
 	}

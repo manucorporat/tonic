@@ -2,6 +2,7 @@ package sseio
 
 import (
 	"bytes"
+	"sync"
 
 	"github.com/gorilla/websocket"
 	"github.com/manucorporat/sse"
@@ -9,6 +10,7 @@ import (
 )
 
 type conn struct {
+	mutex   sync.Mutex
 	socket  *websocket.Conn
 	pending *common.Queue
 }
@@ -20,8 +22,8 @@ func newConn(socket *websocket.Conn) *conn {
 	}
 }
 
-func (c *conn) Type() common.ConnType {
-	return common.FullDuplex
+func (c *conn) Mutex() *sync.Mutex {
+	return &c.mutex
 }
 
 func (c *conn) Send(msg common.Message) error {
@@ -64,11 +66,11 @@ func (c *conn) nextpackage() error {
 		return err
 	}
 	for _, event := range events {
-		c.pending.Enqueue(newMsg(event))
+		c.pending.Enqueue(common.NewMsg(
+			event.Event,
+			event.Id,
+			"",
+			event.Data))
 	}
 	return nil
-}
-
-func newMsg(event sse.Event) common.Msg {
-	return common.NewMsg(event.Event, event.Id, "", event.Data)
 }

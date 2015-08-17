@@ -1,13 +1,8 @@
 package common
 
-import "net/http"
-
-type ConnType int
-
-const (
-	FullDuplex     ConnType = 0
-	ServerToClient ConnType = 1
-	ClientToServer ConnType = 2
+import (
+	"net/http"
+	"sync"
 )
 
 type Protocol interface {
@@ -15,8 +10,8 @@ type Protocol interface {
 }
 
 type Connection interface {
+	Mutex() *sync.Mutex
 	Send(Message) error
-	Emit(string, interface{}) error
 	Recv() (Message, error)
 }
 
