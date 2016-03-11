@@ -6,12 +6,34 @@ import (
 	"fmt"
 )
 
+type EmptyMsg struct{}
+
+var _ Message = EmptyMsg{}
+
+func (EmptyMsg) Namespace() string {
+	return ""
+}
+
+func (EmptyMsg) Name() string {
+	return ""
+}
+
+func (EmptyMsg) Id() string {
+	return ""
+}
+
+func (EmptyMsg) Data() interface{} {
+	return nil
+}
+
 type Msg struct {
 	name      string
 	data      interface{}
 	id        string
 	namespace string
 }
+
+var _ Message = Msg{}
 
 func NewMsg(name, id, namespace string, data interface{}) Msg {
 	return Msg{
@@ -21,8 +43,6 @@ func NewMsg(name, id, namespace string, data interface{}) Msg {
 		data:      data,
 	}
 }
-
-var _ Message = Msg{}
 
 func (m Msg) Namespace() string {
 	return m.namespace

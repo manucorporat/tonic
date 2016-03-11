@@ -13,6 +13,8 @@ type conn struct {
 	socket *websocket.Conn
 }
 
+var _ common.Connection = &conn{}
+
 func newConn(socket *websocket.Conn) *conn {
 	return &conn{socket: socket}
 }
