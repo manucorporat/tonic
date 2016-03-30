@@ -2,7 +2,6 @@ package common
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 )
 
@@ -15,27 +14,27 @@ func (EmptyMsg) Namespace() string {
 }
 
 func (EmptyMsg) Name() string {
-	return ""
+	panic("Event name must be implemented")
 }
 
 func (EmptyMsg) Id() string {
 	return ""
 }
 
-func (EmptyMsg) Data() interface{} {
+func (EmptyMsg) Data() []byte {
 	return nil
 }
 
 type Msg struct {
 	name      string
-	data      interface{}
+	data      []byte
 	id        string
 	namespace string
 }
 
 var _ Message = Msg{}
 
-func NewMsg(name, id, namespace string, data interface{}) Msg {
+func NewMsg(name, id, namespace string, data []byte) Msg {
 	return Msg{
 		name:      name,
 		id:        id,
@@ -56,7 +55,7 @@ func (m Msg) Id() string {
 	return m.id
 }
 
-func (m Msg) Data() interface{} {
+func (m Msg) Data() []byte {
 	return m.data
 }
 
@@ -69,9 +68,5 @@ func (m Msg) String() string {
 }
 
 func BindJSON(msg Message, obj interface{}) error {
-	data, ok := msg.Data().([]byte)
-	if !ok {
-		return errors.New("body can not be binded to json")
-	}
-	return json.Unmarshal(data, obj)
+	return json.Unmarshal(msg.Data(), obj)
 }
