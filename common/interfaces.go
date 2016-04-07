@@ -9,6 +9,7 @@ type Protocol interface {
 type Connection interface {
 	Send(Message) error
 	Recv() (Message, error)
+	Close() error
 }
 
 type Message interface {

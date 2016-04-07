@@ -50,6 +50,10 @@ func (c *conn) Recv() (common.Message, error) {
 	}
 }
 
+func (c *conn) Close() error {
+	return c.socket.Close()
+}
+
 func (c *conn) encode(msg common.Message) []byte {
 	name := escaper.Replace(msg.Name())
 	id := escaper.Replace(msg.Id())
